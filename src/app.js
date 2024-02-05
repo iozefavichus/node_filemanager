@@ -1,8 +1,12 @@
 import { createInterface } from "readline/promises";
+import { resolve } from "path";
 
-const parseInput = (str) => {};
+import * as commands from "./commands.js";
 
 export const app = async (username, homedir) => {
+
+  let currentDir = homedir;
+
   const goodbye = () => {
     console.log(`\nThank you for using File Manager, ${username}, goodbye!`);
   };
@@ -18,7 +22,20 @@ export const app = async (username, homedir) => {
 
   process.on("exit", () => goodbye());
 
-  const commands = new Map([[".exit", exit]]);
+  const up = async () => {
+    currentDir = resolve(currentDir, "..");
+  };
+
+  const add = async ([path]) => {
+    const filePath = resolve(currentDir, path);
+
+    await fs.add(filePath);
+  };
+
+  const commands = new Map([
+    [".exit", exit],
+    ["up", up],
+  ]);
 
   while (true) {
     const answer = await readline.question(`You are currently in ${homedir}\n`);
