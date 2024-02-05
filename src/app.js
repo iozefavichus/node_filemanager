@@ -4,7 +4,6 @@ import { resolve } from "path";
 import * as commands from "./commands.js";
 
 export const app = async (username, homedir) => {
-
   let currentDir = homedir;
 
   const goodbye = () => {
@@ -28,17 +27,24 @@ export const app = async (username, homedir) => {
 
   const add = async ([path]) => {
     const filePath = resolve(currentDir, path);
-
-    await fs.add(filePath);
+    await commands.add(filePath);
   };
+
+  const cat = async ([path]) => {
+    const filePath = resolve(currentDir, path);
+
+    await commands.cat(filePath);
+  }
 
   const commands = new Map([
     [".exit", exit],
     ["up", up],
+    ["add", add],
+    ["cat", cat],
   ]);
 
   while (true) {
-    const answer = await readline.question(`You are currently in ${homedir}\n`);
+    const answer = await readline.question(`You are currently in ${currentDir}\n`);
     const [command, ...args] = answer;
 
     const commandFn = commands.get(command);
