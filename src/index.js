@@ -1,4 +1,5 @@
 import { app } from "./app.js";
+import { homedir } from 'os';
 
 const args = process.argv.slice(2);
 console.log(args);
@@ -9,11 +10,6 @@ const username = usernameArg ? usernameArg.split("=")[1] : "Anonymous";
 const greeting = () => {
   console.log(`Welcome to the File Manager, ${username}!`);
 };
-
-const homedir=()=>{
-    const homedir = os.homedir();
-    console.log(`Home directory: ${homedir}`);
-}
 
 greeting();
 app(username, homedir());
