@@ -14,7 +14,7 @@ const isExists = async (path) => {
 };
 
 const cd = async (currentDir, path) => {
-  console.log('THERE', currentDir, path);
+  console.log('THERE', typeof(currentDir), typeof(path));
   const dirPath = resolve(currentDir, path);
   console.log('DIRPATH', dirpath);
 
