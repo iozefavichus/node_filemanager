@@ -1,9 +1,27 @@
 import { createInterface } from "readline/promises";
-import { resolve } from "path";
+import { resolve } from 'path';
 
 import * as AllCommands from "./commands.js";
 import { calculateHash } from "./hash.js";
 import { operatingSystem } from "./os.js";
+
+import { validate } from "./validate.js";
+
+const parseInput = (str) => {
+  const newStr = str.replace(/\s+/g, ' ');
+  const matches = newStr.match(/(['"])(.*?)\1|\S+/g);
+
+  const parsedPieces = matches.map(piece => {
+    if (piece.startsWith('"') && piece.endsWith('"')) {
+      return piece.slice(1, -1);
+    } else if (piece.startsWith("'") && piece.endsWith("'")) {
+      return piece.slice(1, -1);
+    }
+    return piece;
+  });
+
+  return parsedPieces;
+}
 
 export const app = async (username, homedir) => {
   let currentDir = homedir;
@@ -12,7 +30,13 @@ export const app = async (username, homedir) => {
     console.log(`\nThank you for using File Manager, ${username}, goodbye!`);
   };
 
-  const readline = createInterface({
+  process.on('exit', () => goodbye());
+
+  process.on('SIGINT', () => {
+    process.exit();
+  });
+
+  const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
   });
@@ -22,8 +46,9 @@ export const app = async (username, homedir) => {
   };
 
   const cd = async ([path]) => {
+    console.log(currentDir);
     currentDir = await AllCommands.cd(currentDir, path);
-  }
+  };
 
   process.on("exit", () => goodbye());
 
@@ -74,25 +99,25 @@ export const app = async (username, homedir) => {
     const filePath = resolve(currentDir, path);
 
     await AllCommands.rm(filePath);
-  }
+  };
 
   const os = async ([arg]) => {
     operatingSystem(arg);
-  }
+  };
 
   const compress = async ([source, destination]) => {
     const sourcePath = resolve(currentDir, source);
     const destinationPath = resolve(currentDir, destination);
 
     await AllCommands.compressFile(sourcePath, destinationPath);
-  }
+  };
 
   const decompress = async ([source, destination]) => {
     const sourcePath = resolve(currentDir, source);
     const destinationPath = resolve(currentDir, destination);
 
     await AllCommands.decompressFile(sourcePath, destinationPath);
-  }
+  };
 
   const commands = new Map([
     [".exit", exit],
@@ -112,10 +137,10 @@ export const app = async (username, homedir) => {
   ]);
 
   while (true) {
-    const answer = await readline.question(
+    const answer = await rl.question(
       `You are currently in ${currentDir}\n`
     );
-    const [command, ...args] = answer;
+    const [command, ...args] = parseInput(answer);
 
     const commandFn = commands.get(command);
 
