@@ -1,9 +1,28 @@
+import { createReadStream, createWriteStream } from 'fs';
+import { writeFile, rename, readdir, stat, rm as removeFile } from 'fs/promises';
+import { basename, resolve, dirname, join } from 'path';
+import { createBrotliCompress, createBrotliDecompress } from 'zlib';
+import { pipeline } from 'stream/promises';
+
 const isExists = async (path) => {
   try {
     await access(path);
     return true;
   } catch {
     return false;
+  }
+};
+
+const cd = async (currentDir, path) => {
+  console.log('THERE', currentDir, path);
+  const dirPath = resolve(currentDir, path);
+  console.log('DIRPATH', dirpath);
+
+  if (!(await isExists(dirPath))) {
+    console.log('ERROR');
+    throw new Error("This directory does not exist");
+  } else {
+    return dirPath;
   }
 };
 
@@ -114,16 +133,6 @@ const rn = async (filePath, newFilename) => {
     await rename(filePath, newFilePath);
   } catch {
     throw new Error("Error while renaming file");
-  }
-};
-
-const cd = async (currentDir, path) => {
-  const dirPath = resolve(currentDir, path);
-
-  if (!(await isExists(dirPath))) {
-    throw new Error("This directory does not exist");
-  } else {
-    return dirPath;
   }
 };
 

@@ -1,5 +1,5 @@
 import { createInterface } from "readline/promises";
-import { resolve } from 'path';
+import { resolve } from "path";
 
 import * as AllCommands from "./commands.js";
 import { calculateHash } from "./hash.js";
@@ -8,10 +8,10 @@ import { operatingSystem } from "./os.js";
 import { validate } from "./validate.js";
 
 const parseInput = (str) => {
-  const newStr = str.replace(/\s+/g, ' ');
+  const newStr = str.replace(/\s+/g, " ");
   const matches = newStr.match(/(['"])(.*?)\1|\S+/g);
 
-  const parsedPieces = matches.map(piece => {
+  const parsedPieces = matches.map((piece) => {
     if (piece.startsWith('"') && piece.endsWith('"')) {
       return piece.slice(1, -1);
     } else if (piece.startsWith("'") && piece.endsWith("'")) {
@@ -21,7 +21,7 @@ const parseInput = (str) => {
   });
 
   return parsedPieces;
-}
+};
 
 export const app = async (username, homedir) => {
   let currentDir = homedir;
@@ -30,9 +30,9 @@ export const app = async (username, homedir) => {
     console.log(`\nThank you for using File Manager, ${username}, goodbye!`);
   };
 
-  process.on('exit', () => goodbye());
+  process.on("exit", () => goodbye());
 
-  process.on('SIGINT', () => {
+  process.on("SIGINT", () => {
     process.exit();
   });
 
@@ -46,7 +46,7 @@ export const app = async (username, homedir) => {
   };
 
   const cd = async ([path]) => {
-    console.log(currentDir);
+    console.log('HERE');
     currentDir = await AllCommands.cd(currentDir, path);
   };
 
@@ -137,12 +137,14 @@ export const app = async (username, homedir) => {
   ]);
 
   while (true) {
-    const answer = await rl.question(
-      `You are currently in ${currentDir}\n`
-    );
+    const answer = await rl.question(`You are currently in ${currentDir}\n`);
     const [command, ...args] = parseInput(answer);
+    console.log(command, args);
 
     const commandFn = commands.get(command);
+    console.log(args);
+    console.log("Command", commandFn);
+    console.log(validate(command, args));
 
     if (commandFn && validate(command, args)) {
       try {
